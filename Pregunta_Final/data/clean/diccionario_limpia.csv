@@ -1,0 +1,38 @@
+variable,descripcion,valores,origen
+id,Folio identificador del entrevistado,número,index
+factor,Factor de expansión (ponderador),número; usar en promedios y porcentajes,factor
+estrato,Estrato de diseño muestral,1-5,est
+upm,Unidad primaria de muestreo,texto,upm_muestra
+sexo,Sexo,Hombre / Mujer,sexo
+mujer,Indicador de mujer,1 = Mujer; 0 = Hombre,sexo
+edad,Edad en años,25-64,edad
+cohorte,Grupo de edad,25-34 / 35-44 / 45-54 / 55-64,cohorte
+region,Región donde vive,Norte / Norte-occidente / Centro-norte / Centro / Sur,region
+urbano,Vive en localidad urbana,1 = Urbano; 0 = Rural,rururb
+entidad,Entidad federativa (código INEGI),1-32,entidad
+autoadscripcion,Cómo se considera la persona,Negra / Indígena / Blanca / Mestiza / Ninguna,p110
+lengua_indigena,Habla alguna lengua indígena,1 = Sí; 0 = No,p111
+tono_piel_letra,Tono de piel según la paleta de color,A (más oscuro) ... K (más claro),p112
+tono_piel,Tono de piel en número,1 (más oscuro) ... 11 (más claro),p112
+tono_piel_grupo,Tono de piel en 3 grupos,Oscuro (A-E) / Medio (F-G) / Claro (H-K),p112
+L_dorso,Colorímetro CIELab L (luminosidad) - dorso de la mano,0 negro ... 100 blanco,p113dL
+a_dorso,Colorímetro CIELab a - dorso de la mano,número,p113da
+b_dorso,Colorímetro CIELab b - dorso de la mano,número,p113db
+L_muneca,Colorímetro CIELab L (luminosidad) - muñeca,0 negro ... 100 blanco,p113mL
+a_muneca,Colorímetro CIELab a - muñeca,número,p113ma
+b_muneca,Colorímetro CIELab b - muñeca,número,p113mb
+luminosidad_piel,Promedio de L en dorso y muñeca (medida objetiva del tono),más alto = más claro,p113dL y p113mL
+nivel_educ_num,Nivel educativo (código),1-4,educ
+nivel_educ,Nivel educativo en 4 categorías (ESRU),Primaria o menos / Secundaria / Preparatoria / Profesional,educ
+universidad,Terminó nivel profesional,1 = Sí; 0 = No,educ
+anios_esc,Años de escolaridad,0-19,p9 y p10
+educ_padre,Nivel educativo del padre,igual que nivel_educ,educp
+educ_madre,Nivel educativo de la madre,igual que nivel_educ,educm
+ingreso_pc,Ingreso mensual per cápita del hogar (imputado por ESRU),pesos,ingc_pc
+log_ingreso_pc,Logaritmo del ingreso per cápita,número,ingc_pc
+quintil_ingreso,Quintil de ingreso per cápita (ponderado),1 (20% más pobre) ... 5 (20% más rico),ingc_pc
+escalera_actual,Escalera subjetiva: dónde pone su hogar hoy vs. todos los de México,1 (más pobre) ... 10 (más rico),p103
+escalera_14,Escalera subjetiva: hogar donde vivía a los 14 años,1 (más pobre) ... 10 (más rico),p104
+indice_riqueza,Índice de riqueza del hogar (1er componente principal de 48 bienes y servicios),media 0; desviación 1; más alto = más rico,p88 p89 p94-p97 p99 tamhog
+quintil_riqueza,Quintil del índice de riqueza (ponderado),1 (20% más pobre) ... 5 (20% más rico),indice_riqueza
+clase_ocup,Clase ocupacional actual (ESRU); vacía si no trabaja,1-6,clase

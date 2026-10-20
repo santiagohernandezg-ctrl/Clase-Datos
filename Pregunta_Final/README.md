@@ -11,7 +11,7 @@ Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Es
 ├── data/
 │   ├── raw/BASES_DE_DATOS_EMOVI2023.zip   # bases originales (sin modificar)
 │   └── clean/
-│       ├── emovi2023_limpia.csv   # base lista para analizar (17,843 x 37)
+│       ├── emovi2023_limpia.csv   # base lista para analizar (17,349 x 37)
 │       └── diccionario_limpia.csv # qué significa cada columna
 └── docs/
     ├── Diccionario_ESRU_EMOVI_2023.xlsx   # diccionario oficial
@@ -36,6 +36,7 @@ El script descomprime `entrevistado_2023.dta` del zip (pesa 41 MB, demasiado par
 | Escolaridad | `nivel_educ` = variable oficial de ESRU (4 niveles). `anios_esc` = años de escuela construidos con p9 + p10. Si el grado es "No sabe" queda vacío (292–314 casos). |
 | Nivel socioeconómico | Tres medidas: (1) ingreso per cápita imputado por ESRU y sus quintiles; (2) escalera subjetiva 1–10; (3) índice de riqueza con componentes principales de 48 bienes y servicios de la vivienda. |
 | Quintiles | Calculados con el factor de expansión, para que cada quintil sea 20% de la población. |
+| Outliers | Regla del rango intercuartil (IQR × 1.5) en `log_ingreso_pc`, `indice_riqueza` y `luminosidad_piel`. Se eliminan **494 personas (2.8%)**; quedan 17,349. Las filas eliminadas se guardan en `data/clean/outliers_eliminados.csv`. No se buscan en edad (ya acotada 25–64), escaleras (1–10), años de escuela (los extremos son casos reales) ni en el factor de expansión. |
 | Ponderador | Usar `factor` en promedios y porcentajes; `estrato` y `upm` si se calculan errores estándar con diseño muestral. |
 
 ## Faltantes relevantes

@@ -108,8 +108,8 @@ def formato_eje_x(ax):
 def guardar(fig, ax, titulo, subtitulo, archivo):
     ax.set_title(titulo, loc="left", fontsize=14, fontweight="bold", color=TINTA, pad=26)
     ax.text(0, 1.03, subtitulo, transform=ax.transAxes, fontsize=10, color=GRIS)
-    fig.text(0.01, 0.01, "A–C e I–K se agrupan porque tienen pocas personas. "
-             "Fuente: ESRU-EMOVI 2023, datos ponderados con el factor de expansión.",
+    fig.text(0.01, 0.01, "A–C e I–K se agrupan porque tienen pocas personas; punto hueco = "
+             f"menos de {MINIMO} personas. Fuente: ESRU-EMOVI 2023, datos ponderados.",
              fontsize=8.5, color=GRIS)
     fig.tight_layout(rect=(0, 0.03, 1, 1))
     fig.savefig(SALIDA / archivo, dpi=200)

@@ -11,7 +11,8 @@ Este script:
   3. Les pone nombres claros y etiquetas en español.
   4. Construye variables nuevas: tono de piel numérico y en grupos,
      años de escolaridad, quintiles de ingreso y un índice de riqueza.
-  5. Guarda la base limpia en CSV y un diccionario de variables.
+  5. Detecta y quita outliers con la regla del rango intercuartil (IQR).
+  6. Guarda la base limpia en CSV (y aparte las filas eliminadas).
 
 Cómo correrlo (desde la carpeta del repositorio):
     pip install pandas numpy pyreadstat
@@ -150,7 +151,7 @@ df["educ_madre"] = raw["educm"].map(niveles_educ)
 # 7a. Ingreso per cápita mensual del hogar (imputado por ESRU, sin faltantes)
 df["ingreso_pc"] = raw["ingc_pc"]
 df["log_ingreso_pc"] = np.log(raw["ingc_pc"])
-df["quintil_ingreso"] = quintil_ponderado(df["ingreso_pc"], df["factor"])
+df["quintil_ingreso"] = np.nan   # se calcula después de quitar outliers (paso 8)
 
 # 7b. Escalera subjetiva: dónde se pone el hogar del 1 (más pobre) al 10 (más rico)
 df["escalera_actual"] = raw["p103"]
@@ -173,7 +174,7 @@ pc1 = z.values @ vectores[:, -1]                             # componente más g
 if np.corrcoef(pc1, df["log_ingreso_pc"])[0, 1] < 0:         # que "más alto = más rico"
     pc1 = -pc1
 df["indice_riqueza"] = (pc1 - pc1.mean()) / pc1.std()        # media 0, desviación 1
-df["quintil_riqueza"] = quintil_ponderado(df["indice_riqueza"], df["factor"])
+df["quintil_riqueza"] = np.nan   # se calcula después de quitar outliers (paso 8)
 print(f"Índice de riqueza: el 1er componente explica "
       f"{valores_propios[-1] / valores_propios.sum():.0%} de la varianza")
 
@@ -181,7 +182,54 @@ print(f"Índice de riqueza: el 1er componente explica "
 df["clase_ocup"] = raw["clase"]
 
 # ---------------------------------------------------------------------------
-# 8. Revisiones rápidas
+# 8. Outliers (valores atípicos)
+# ---------------------------------------------------------------------------
+# Regla del rango intercuartil (IQR): un valor es outlier si está
+#   por debajo de Q1 - 1.5*IQR  o  por arriba de Q3 + 1.5*IQR
+# donde Q1 = percentil 25, Q3 = percentil 75 e IQR = Q3 - Q1.
+#
+# Variables donde SÍ se buscan outliers:
+#   - log_ingreso_pc: el ingreso se revisa en logaritmo porque el ingreso en
+#     pesos es muy sesgado (en pesos la regla marcaría a 1,336 personas solo
+#     por tener ingresos altos, aunque sean ingresos reales).
+#   - indice_riqueza
+#   - luminosidad_piel (medición del colorímetro)
+#
+# Variables donde NO se buscan (y por qué):
+#   - edad: ya viene acotada a 25-64 años por diseño de la encuesta.
+#   - escalera_actual / escalera_14: escala fija de 1 a 10.
+#   - anios_esc: la regla marcaría a 3,010 personas (0-4 años de escuela o
+#     posgrado), que son casos reales y justo los que importan para la pregunta.
+#   - tono_piel: escala fija A-K, sin valores imposibles.
+#   - factor: es el ponderador de la encuesta, no se debe modificar.
+def limites_iqr(serie):
+    q1, q3 = serie.quantile([0.25, 0.75])
+    iqr = q3 - q1
+    return q1 - 1.5 * iqr, q3 + 1.5 * iqr
+
+
+VARIABLES_OUTLIERS = ["log_ingreso_pc", "indice_riqueza", "luminosidad_piel"]
+es_outlier = pd.Series(False, index=df.index)
+print("\nOutliers por variable (regla IQR 1.5):")
+for var in VARIABLES_OUTLIERS:
+    bajo, alto = limites_iqr(df[var].dropna())
+    marca = (df[var] < bajo) | (df[var] > alto)       # NaN no cuenta como outlier
+    df[f"outlier_{var}"] = marca.astype(int)
+    es_outlier |= marca
+    print(f"  {var:18s} rango aceptado [{bajo:7.2f}, {alto:7.2f}]  ->  {marca.sum():4d} personas")
+
+outliers = df[es_outlier]
+outliers.to_csv(SALIDA / "outliers_eliminados.csv", index=False, encoding="utf-8-sig")
+df = df[~es_outlier].drop(columns=[f"outlier_{v}" for v in VARIABLES_OUTLIERS])
+print(f"  Total eliminadas: {len(outliers):,} personas "
+      f"({len(outliers) / (len(df) + len(outliers)):.1%} de la muestra)")
+
+# Quintiles calculados ya sin outliers
+df["quintil_ingreso"] = quintil_ponderado(df["ingreso_pc"], df["factor"])
+df["quintil_riqueza"] = quintil_ponderado(df["indice_riqueza"], df["factor"])
+
+# ---------------------------------------------------------------------------
+# 9. Revisiones rápidas
 # ---------------------------------------------------------------------------
 assert df["id"].is_unique, "Hay folios repetidos"
 assert df["tono_piel"].between(1, 11).all(), "Tono de piel fuera de rango"
@@ -193,7 +241,7 @@ faltan = df.isna().sum()
 print(faltan[faltan > 0].to_string())
 
 # ---------------------------------------------------------------------------
-# 9. Guardar
+# 10. Guardar
 # ---------------------------------------------------------------------------
 df.to_csv(SALIDA / "emovi2023_limpia.csv", index=False, encoding="utf-8-sig")
 print(f"\nBase limpia guardada: {df.shape[0]:,} filas x {df.shape[1]} columnas")

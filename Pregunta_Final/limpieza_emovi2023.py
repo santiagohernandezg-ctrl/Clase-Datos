@@ -241,7 +241,27 @@ faltan = df.isna().sum()
 print(faltan[faltan > 0].to_string())
 
 # ---------------------------------------------------------------------------
-# 10. Guardar
+# 10. Base final: solo las variables que se usan en el análisis
 # ---------------------------------------------------------------------------
-df.to_csv(SALIDA / "emovi2023_limpia.csv", index=False, encoding="utf-8-sig")
-print(f"\nBase limpia guardada: {df.shape[0]:,} filas x {df.shape[1]} columnas")
+VARIABLES_FINALES = [
+    # Identificación y ponderador
+    "id", "factor",
+    # Tono de piel (variable principal)
+    "tono_piel_letra", "tono_piel", "tono_piel_grupo", "luminosidad_piel",
+    # Escolaridad (resultado 1)
+    "anios_esc", "nivel_educ", "universidad",
+    # Nivel socioeconómico (resultado 2)
+    "ingreso_pc", "log_ingreso_pc", "quintil_ingreso", "indice_riqueza", "escalera_actual",
+    # Sexo (para comparar hombres y mujeres)
+    "sexo", "mujer",
+    # Variables para patrones adicionales y controles
+    "edad", "cohorte", "region", "urbano", "autoadscripcion", "lengua_indigena",
+    "escalera_14",
+]
+final = df[VARIABLES_FINALES]
+
+# ---------------------------------------------------------------------------
+# 11. Guardar
+# ---------------------------------------------------------------------------
+final.to_csv(SALIDA / "emovi2023_final.csv", index=False, encoding="utf-8-sig")
+print(f"\nBase final guardada: {final.shape[0]:,} filas x {final.shape[1]} columnas")

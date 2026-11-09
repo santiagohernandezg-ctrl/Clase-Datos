@@ -1,0 +1,24 @@
+﻿variable,descripcion,valores,origen
+id,Folio identificador del entrevistado,número,index
+factor,Factor de expansión (ponderador),número; usar en promedios y porcentajes,factor
+tono_piel_letra,Tono de piel según la paleta de color,A (más oscuro) ... K (más claro),p112
+tono_piel,Tono de piel en número,1 (más oscuro) ... 11 (más claro),p112
+tono_piel_grupo,Tono de piel en 3 grupos,Oscuro (A-E) / Medio (F-G) / Claro (H-K),p112
+luminosidad_piel,Promedio de L en dorso y muñeca (medida objetiva del tono),más alto = más claro,p113dL y p113mL (colorímetro)
+anios_esc,Años de escolaridad,0-19,p9 y p10
+nivel_educ,Nivel educativo en 4 categorías (ESRU),Primaria o menos / Secundaria / Preparatoria / Profesional,educ
+universidad,Terminó nivel profesional,1 = Sí; 0 = No,educ
+ingreso_pc,Ingreso mensual per cápita del hogar (imputado por ESRU),pesos,ingc_pc
+log_ingreso_pc,Logaritmo del ingreso per cápita,número,ingc_pc
+quintil_ingreso,Quintil de ingreso per cápita (ponderado),1 (20% más pobre) ... 5 (20% más rico),ingc_pc
+indice_riqueza,Índice de riqueza del hogar (1er componente principal de 48 bienes y servicios),media 0; desviación 1; más alto = más rico,p88 p89 p94-p97 p99 tamhog
+escalera_actual,Escalera subjetiva: dónde pone su hogar hoy vs. todos los de México,1 (más pobre) ... 10 (más rico),p103
+sexo,Sexo,Hombre / Mujer,sexo
+mujer,Indicador de mujer,1 = Mujer; 0 = Hombre,sexo
+edad,Edad en años,25-64,edad
+cohorte,Grupo de edad,25-34 / 35-44 / 45-54 / 55-64,cohorte
+region,Región donde vive,Norte / Norte-occidente / Centro-norte / Centro / Sur,region
+urbano,Vive en localidad urbana,1 = Urbano; 0 = Rural,rururb
+autoadscripcion,Cómo se considera la persona,Negra / Indígena / Blanca / Mestiza / Ninguna,p110
+lengua_indigena,Habla alguna lengua indígena,1 = Sí; 0 = No,p111
+escalera_14,Escalera subjetiva: hogar donde vivía a los 14 años,1 (más pobre) ... 10 (más rico),p104

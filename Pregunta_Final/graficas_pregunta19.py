@@ -29,7 +29,7 @@ import pandas as pd
 # 0. Rutas y datos
 # ---------------------------------------------------------------------------
 CARPETA = Path(__file__).resolve().parent
-df = pd.read_csv(CARPETA / "data" / "clean" / "emovi2023_limpia.csv")
+df = pd.read_csv(CARPETA / "data" / "clean" / "emovi2023_final.csv")
 SALIDA = CARPETA / "graficas"
 SALIDA.mkdir(exist_ok=True)
 

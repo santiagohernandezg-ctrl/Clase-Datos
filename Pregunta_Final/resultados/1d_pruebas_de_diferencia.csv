@@ -1,0 +1,31 @@
+﻿pregunta,grupo,prueba,estadistico,p_valor,n,nota,significativo_5pct
+Supuesto: ¿varianzas iguales en escolaridad entre tonos?,Total,Levene,1.5649897723122173,0.20911954083540266,17427,p<0.05 = varianzas distintas -> se usa también Kruskal-Wallis,No
+¿Escolaridad promedio distinta entre los 3 tonos?,Total,ANOVA de un factor,68.28407140689276,2.8854885688915595e-30,17427,,Sí
+¿Escolaridad distinta entre los 3 tonos? (sin suponer normalidad),Total,Kruskal-Wallis,136.54268593971557,2.23940413644351e-30,17427,,Sí
+¿Ingreso distinto entre los 3 tonos?,Total,Kruskal-Wallis,74.4998969368265,6.645886637174895e-17,17427,ingreso muy sesgado -> no paramétrica,Sí
+¿Índice de riqueza distinto entre los 3 tonos?,Total,ANOVA de un factor,145.90744810135544,1.4387280957240518e-63,17427,,Sí
+¿El nivel educativo depende del tono?,Total,Chi-cuadrada de independencia,133.31839977134115,2.570371524174987e-26,17427,"V de Cramér = 0.062 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿El quintil de ingreso depende del tono?,Total,Chi-cuadrada de independencia,77.73290115515499,1.3964298450484002e-13,17427,"V de Cramér = 0.047 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿% con universidad distinto entre Claro y Oscuro?,Total,z de dos proporciones,9.315153285073643,1.2177657233315464e-20,7185,Claro 21.4% vs Oscuro 13.0% (sin ponderar),Sí
+Supuesto: ¿varianzas iguales en escolaridad entre tonos?,Hombre,Levene,1.626600837030116,0.19666463805457662,7659,p<0.05 = varianzas distintas -> se usa también Kruskal-Wallis,No
+¿Escolaridad promedio distinta entre los 3 tonos?,Hombre,ANOVA de un factor,33.525532743807865,3.1873823192432013e-15,7659,,Sí
+¿Escolaridad distinta entre los 3 tonos? (sin suponer normalidad),Hombre,Kruskal-Wallis,70.57094298249713,4.739302612206861e-16,7659,,Sí
+¿Ingreso distinto entre los 3 tonos?,Hombre,Kruskal-Wallis,66.89933519064164,2.971624579079947e-15,7659,ingreso muy sesgado -> no paramétrica,Sí
+¿Índice de riqueza distinto entre los 3 tonos?,Hombre,ANOVA de un factor,72.98667280876583,3.9873691519597136e-32,7659,,Sí
+¿El nivel educativo depende del tono?,Hombre,Chi-cuadrada de independencia,66.6523784725046,1.9824832458713753e-12,7659,"V de Cramér = 0.066 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿El quintil de ingreso depende del tono?,Hombre,Chi-cuadrada de independencia,66.41261011320695,2.535046448328767e-11,7659,"V de Cramér = 0.066 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿% con universidad distinto entre Claro y Oscuro?,Hombre,z de dos proporciones,6.776804333476564,1.2286310056404954e-11,3246,Claro 23.3% vs Oscuro 14.1% (sin ponderar),Sí
+Supuesto: ¿varianzas iguales en escolaridad entre tonos?,Mujer,Levene,0.08409608967555263,0.9193435783012327,9768,p<0.05 = varianzas distintas -> se usa también Kruskal-Wallis,No
+¿Escolaridad promedio distinta entre los 3 tonos?,Mujer,ANOVA de un factor,56.12018460305061,5.8387648660459705e-25,9768,,Sí
+¿Escolaridad distinta entre los 3 tonos? (sin suponer normalidad),Mujer,Kruskal-Wallis,114.00055671226774,1.7583026999577325e-25,9768,,Sí
+¿Ingreso distinto entre los 3 tonos?,Mujer,Kruskal-Wallis,105.90084027954727,1.0090779560487234e-23,9768,ingreso muy sesgado -> no paramétrica,Sí
+¿Índice de riqueza distinto entre los 3 tonos?,Mujer,ANOVA de un factor,109.87326346624481,6.480821525900831e-48,9768,,Sí
+¿El nivel educativo depende del tono?,Mujer,Chi-cuadrada de independencia,115.11481696928988,1.7274100402823936e-22,9768,"V de Cramér = 0.077 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿El quintil de ingreso depende del tono?,Mujer,Chi-cuadrada de independencia,108.76019181946421,6.844850954385624e-20,9768,"V de Cramér = 0.075 (0 = nada, 0.1 = débil, 0.3 = moderada)",Sí
+¿% con universidad distinto entre Claro y Oscuro?,Mujer,z de dos proporciones,6.894753017100542,5.395846754046112e-12,3939,Claro 20.2% vs Oscuro 11.8% (sin ponderar),Sí
+¿Escolaridad distinta entre hombres y mujeres?,Total,t de Welch,-8.939712362273927,4.3123580772577245e-19,17427,,Sí
+¿Ingreso distinto entre hombres y mujeres?,Total,Mann-Whitney U,26692138.0,9.142281651253805e-232,17427,,Sí
+¿Las mujeres fueron clasificadas en tonos distintos a los hombres?,Total,t de Welch,15.006977578487811,1.4699057338911959e-50,17427,"si sí, hay que comparar dentro de cada sexo",Sí
+Supuesto: ¿anios_esc es simétrica?,Total,Sesgo (skewness),-0.21795619666812555,,17427,0 = simétrica; >1 = cola larga a la derecha,
+Supuesto: ¿ingreso_pc es simétrica?,Total,Sesgo (skewness),2.0864617873430724,,17427,0 = simétrica; >1 = cola larga a la derecha,
+Supuesto: ¿log_ingreso_pc es simétrica?,Total,Sesgo (skewness),0.05915334128035261,,17427,0 = simétrica; >1 = cola larga a la derecha,

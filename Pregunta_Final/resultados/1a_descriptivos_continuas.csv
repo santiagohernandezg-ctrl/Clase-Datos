@@ -1,0 +1,9 @@
+﻿variable,descripcion,n,media,mediana,desv_est,min,max
+tono_piel,Tono de piel (1 = A más oscuro ... 11 = K más claro),17427,6.519543118103519,7.0,1.373635314206409,1.0,11.0
+luminosidad_piel,"Luminosidad de la piel, colorímetro (más alto = más claro)",16873,52.744617518592186,52.595,6.333179297607038,36.0,71.62
+anios_esc,Años de escolaridad,17427,10.17553906592241,9.0,4.415154203109869,0.0,19.0
+ingreso_pc,Ingreso mensual por persona del hogar (pesos),17427,6477.335047949219,4815.675,5450.479656467585,777.5321,41059.254
+indice_riqueza,Índice de riqueza del hogar (media 0),17427,-0.11663096144843163,-0.1129506645437539,1.0107819699881198,-2.69433415184516,2.727013377031569
+escalera_actual,Escalera subjetiva hoy (1-10),17427,5.387198135000305,5.0,1.989940705838623,1.0,10.0
+escalera_14,Escalera subjetiva a los 14 años (1-10),17427,4.3218973327129175,4.0,2.385693382486551,1.0,10.0
+edad,Edad (años),17427,41.84405853767747,40.0,11.339209873451988,25.0,64.0

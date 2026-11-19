@@ -8,6 +8,10 @@ Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Es
 
 ```
 ├── limpieza_emovi2023.py            # limpieza en los 7 pasos de la guía del curso
+├── funciones_ponderadas.py          # promedios, medianas y regresiones con factor de expansión
+├── 1_estadisticas_descriptivas.py   # PASO 1: descriptivos, por grupo, pruebas y regresiones
+├── 2_patrones_exploratorios.py      # PASO 2: patrones adicionales (origen, ocupación, región...)
+├── 3_visualizaciones.py             # PASO 3: las 8 gráficas finales
 ├── data/
 │   ├── raw/BASES_DE_DATOS_EMOVI2023.zip   # bases originales (sin modificar)
 │   └── clean/
@@ -16,8 +20,12 @@ Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Es
 │       └── outliers_eliminados.csv  # las 416 personas quitadas por ser atípicas
 ├── resultados/
 │   ├── 0_perfilado_variables.csv    # paso 1: tipo, rango y % de nulos de cada variable
-│   └── bitacora_limpieza.csv        # qué se hizo en cada paso y a cuántas observaciones afectó
-├── graficas/eda/                    # histogramas y boxplots del análisis exploratorio
+│   ├── bitacora_limpieza.csv        # qué se hizo en cada paso y a cuántas observaciones afectó
+│   ├── 1a ... 1e_*.csv              # tablas del paso 1
+│   └── 2a ... 2h_*.csv              # tablas del paso 2
+├── graficas/
+│   ├── fig1 ... fig8_*.png          # gráficas finales
+│   └── eda/                         # histogramas y boxplots de la limpieza
 └── docs/
     ├── Diccionario_ESRU_EMOVI_2023.xlsx   # diccionario oficial
     └── pregunta_19.png
@@ -26,9 +34,14 @@ Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Es
 ## Cómo reproducir
 
 ```bash
-pip install pandas numpy pyreadstat matplotlib
+pip install pandas numpy pyreadstat matplotlib scipy statsmodels
 python limpieza_emovi2023.py
+python 1_estadisticas_descriptivas.py
+python 2_patrones_exploratorios.py
+python 3_visualizaciones.py
 ```
+
+Se corren en ese orden: cada paso usa lo que genera el anterior.
 
 El script descomprime `entrevistado_2023.dta` del zip (pesa 41 MB, demasiado para subirlo directo a GitHub) y genera la base final, el perfilado y la bitácora.
 
@@ -67,3 +80,19 @@ Se usa solo `entrevistado_2023.dta` (una fila = una persona). `hogar_2023` es la
 - **Escolaridad imputada:** 310 personas de la base final (1.8%) tienen años de escuela imputados (`esc_imputada = 1`).
 - **Grupos extremos pequeños:** pocas personas en los tonos A–C e I–K.
 - **Ponderador:** todos los promedios y porcentajes deben usar `factor` para representar a la población.
+
+## Resultados principales
+
+Todo ponderado con `factor`. Regresiones con errores estándar por conglomerado (`upm`).
+
+1. **Sí hay asociación.** De piel oscura (A–E) a clara (H–K): +1.4 años de escuela, el doble de universidad (13% → 26%) y +26% de ingreso mediano por persona. Todas las pruebas (ANOVA, Kruskal-Wallis, chi-cuadrada, z de proporciones) dan p < 0.001, en hombres y en mujeres.
+2. **¿Difiere entre hombres y mujeres?** En escolaridad y riqueza, **no** (interacción tono × mujer con p = 0.58 y 0.87). En ingreso, el tono pesa más en los hombres (6.1% vs. 3.8% por letra, p = 0.08; p = 0.04 con origen familiar), pero con el colorímetro la diferencia no aparece: evidencia débil.
+3. **Origen familiar:** entre 36% y 48% de la ventaja de los claros desaparece al controlar la educación de los padres y la escalera a los 14 años. El resto persiste.
+4. **Mismo estudio, distinto ingreso (solo en hombres):** con la misma escolaridad, una letra más clara = +3% de ingreso en hombres (p < 0.001) y 0% en mujeres (p = 0.60). En mujeres, el tono actúa a través de la educación.
+5. **Ocupación:** 14% de los hombres claros que trabajan están en puestos no manuales de alta calificación vs. 5% de los oscuros. 63% de las mujeres oscuras no trabaja vs. 47% de las claras.
+6. **Percepción:** con el mismo ingreso, la gente de piel oscura se ubica igual o más arriba en la escalera social.
+7. **Región:** la brecha educativa por tono es mayor en el Sur (+0.49 años por letra) y no es significativa en Centro-norte ni Norte-occidente.
+8. **No es solo etnicidad:** el efecto del tono se mantiene al controlar lengua indígena y autoadscripción.
+9. **Robustez:** con el colorímetro el efecto es incluso mayor; sin la escolaridad imputada, casi igual.
+
+Limitaciones del análisis: es asociación, no causalidad; el ingreso es del hogar (la mitad de las mujeres no trabaja); las pruebas clásicas (scipy) no usan el ponderador, las regresiones sí.

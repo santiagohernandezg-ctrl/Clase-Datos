@@ -1,5 +1,5 @@
 ﻿paso,accion,observaciones_afectadas,filas_restantes,decision
-1. EDA,Perfilado de 22 variables originales,0,17843,Sin cambios; se detecta que el ingreso está muy sesgado y que p10 y el colorímetro tienen nulos
+1. EDA,Perfilado de 27 variables originales,0,17843,Sin cambios; se detecta que el ingreso está muy sesgado y que p10 y el colorímetro tienen nulos
 2. Errores,p10 = 9 ('No sabe' el último grado) recodificado a NA,314,17843,"Código especial del diccionario, no es un grado real"
 2. Errores,p9 = 97 ('Ninguno') revisado,344,17843,Se conserva: es una respuesta válida (sin escolaridad = 0 años)
 2. Errores,Regla: edad entre 25 y 64,0,17843,Todas cumplen
@@ -13,6 +13,8 @@
 3. Duplicados,Folios repetidos (misma persona dos veces),0,17843,Ninguno; cada folio es único
 4. Nulos,Escolaridad sin grado ('No sabe'): imputada con mediana/moda de su nivel,315,17843,"Imputación simple: 1.8%, nulos NO aleatorios (más jóvenes y educados); se marca en esc_imputada"
 4. Nulos,Colorímetro sin medición en dorso y muñeca,468,17843,Se deja NA (2.6%): variable secundaria de validación; la paleta (variable principal) está completa
+4. Nulos,Trabaja pero sin clase ocupacional asignada,58,17843,Se deja NA (0.3%): muy pocos casos; se excluyen solo de los análisis de ocupación
+4. Nulos,No sabe la educación de ninguno de sus padres,1319,17843,Categoría 'No sabe' (no se imputa: no hay información de dónde inferirla)
 4. Nulos,"Tono de piel, sexo, edad, ingreso, escaleras y factor",0,17843,Sin nulos
 5. Outliers,"Ingreso per cápita fuera de $774-$41,208 (IQR en log)",341,17843,Se eliminan: es ingreso IMPUTADO por ESRU y los extremos de un modelo son poco confiables y jalan los promedios
 5. Outliers,Índice de riqueza fuera del rango IQR,93,17843,Se eliminan: combinaciones de bienes extremas que distorsionan el índice
@@ -21,5 +23,6 @@
 5. Outliers,Total de personas eliminadas por outliers,416,17427,2.3% de la muestra
 6. Consistencias,Años de escuela > edad - 5 (imposible),0,17427,Ninguno
 6. Consistencias,Nivel ESRU mayor que el nivel declarado en p9,0,17427,Ninguno
+6. Consistencias,No trabajó (p59 = 6) pero tiene clase ocupacional,0,17427,Ninguno
 6. Consistencias,"Paleta vs colorímetro: correlación r = 0.33 (positiva, como se espera)",16,17427,Casos con colorímetro a >3 desv. est. de su letra: medición a NA
 7. Encoding,Tono ordinal (1-11) y en 3 grupos; binarias mujer/universidad/urbano/lengua; log del ingreso; quintiles ponderados; índice de riqueza (PCA),0,17427,"Variables listas para tablas, pruebas y regresiones"

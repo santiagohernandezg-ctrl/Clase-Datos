@@ -84,9 +84,12 @@ def quintil_ponderado(valores, pesos):
 
 # Variables originales que usa el análisis (el resto de las 296 no se necesita)
 VARS_ORIGINALES = {
-    "index": "Folio", "factor": "Factor de expansión", "sexo": "Sexo", "edad": "Edad",
-    "cohorte": "Grupo de edad", "region": "Región", "rururb": "Rural/urbano",
+    "index": "Folio", "factor": "Factor de expansión", "est": "Estrato de diseño",
+    "upm_muestra": "Unidad primaria de muestreo", "sexo": "Sexo", "edad": "Edad",
+    "region": "Región", "rururb": "Rural/urbano",
     "p9": "Último nivel escolar", "p10": "Último grado aprobado", "educ": "Nivel educativo ESRU",
+    "educp": "Nivel educativo del padre", "educm": "Nivel educativo de la madre",
+    "p59": "Trabajó la semana pasada", "clase": "Clase ocupacional (ESRU)",
     "p103": "Escalera hoy (1-10)", "p104": "Escalera a los 14 (1-10)",
     "p110": "Autoadscripción", "p111": "Habla lengua indígena",
     "p112": "Tono de piel (paleta A-K)", "p113dL": "Colorímetro L dorso",
@@ -116,7 +119,7 @@ for var, nombre in VARS_ORIGINALES.items():
 perfil = pd.DataFrame(perfil)
 perfil.to_csv(RESULTADOS / "0_perfilado_variables.csv", index=False, encoding="utf-8-sig")
 print(perfil[["variable", "tipo", "n_categorias", "pct_nulos", "min", "max"]].to_string(index=False))
-anotar("1. EDA", "Perfilado de 22 variables originales", 0, len(raw),
+anotar("1. EDA", f"Perfilado de {len(VARS_ORIGINALES)} variables originales", 0, len(raw),
        "Sin cambios; se detecta que el ingreso está muy sesgado y que p10 y el colorímetro tienen nulos")
 
 # Visualización rápida: ingreso en pesos vs. en logaritmo, y boxplots
@@ -178,8 +181,9 @@ df = pd.DataFrame(index=raw.index)
 df["id"] = raw["index"]
 df["factor"] = raw["factor"]
 df["sexo"] = raw["sexo"].map({1: "Hombre", 2: "Mujer"})
+df["estrato"] = raw["est"]                      # diseño muestral: para errores
+df["upm"] = raw["upm_muestra"]                    # estándar correctos (por conglomerado)
 df["edad"] = raw["edad"]
-df["cohorte"] = raw["cohorte"].map({1: "25-34", 2: "35-44", 3: "45-54", 4: "55-64"})
 df["region"] = raw["region"].map({1: "Norte", 2: "Norte-occidente", 3: "Centro-norte",
                                   4: "Centro", 5: "Sur"})
 df["autoadscripcion"] = raw["p110"].map({1: "Negra", 2: "Indígena", 3: "Blanca",
@@ -196,6 +200,21 @@ ANIOS_PREVIOS = {1: 0, 2: 0, 3: 6, 4: 6, 5: 9, 6: 9, 7: 6, 8: 9, 9: 12, 10: 9,
 df["anios_esc"] = raw["p9"].map(ANIOS_PREVIOS) + raw["p10"]
 df.loc[raw["p9"].isin([1, 97]), "anios_esc"] = 0          # preescolar o ninguno
 df["nivel_educ_num"] = raw["educ"]
+
+# Ocupación actual: la ocupación es una de las 3 medidas clásicas del nivel
+# socioeconómico (ingreso, educación y ocupación). Quien no trabajó la semana
+# pasada (p59 = 6) no tiene clase: eso NO es un dato faltante, es la categoría
+# "No trabaja".
+CLASES = {1: "Agrícola", 2: "Manual baja calificación", 3: "Manual alta calificación",
+          4: "Comercio", 5: "No manual baja calificación", 6: "No manual alta calificación"}
+df["clase_ocup"] = raw["clase"].map(CLASES)
+df.loc[raw["p59"] == 6, "clase_ocup"] = "No trabaja"
+
+# Educación de los padres: el nivel MÁS ALTO entre padre y madre. Es un control
+# de origen familiar: se relaciona con el tono (r = 0.12) y fuertemente con la
+# escolaridad (r = 0.47) y el ingreso (r = 0.38) de la persona.
+NIVELES = {1: "Primaria o menos", 2: "Secundaria", 3: "Preparatoria", 4: "Profesional"}
+df["educ_padres"] = np.fmax(raw["educp"], raw["educm"]).map(NIVELES)
 
 # ===========================================================================
 # PASO 4. NULOS
@@ -228,6 +247,13 @@ print(f"  Sin colorímetro: tono medio en paleta {raw.loc[falta_lum, 'p112'].map
       f" vs {raw.loc[~falta_lum, 'p112'].map(dict(zip('ABCDEFGHIJK', range(1, 12)))).mean():.2f}")
 anotar("4. Nulos", "Colorímetro sin medición en dorso y muñeca", falta_lum.sum(), len(df),
        "Se deja NA (2.6%): variable secundaria de validación; la paleta (variable principal) está completa")
+falta_ocup = df["clase_ocup"].isna()
+anotar("4. Nulos", "Trabaja pero sin clase ocupacional asignada", falta_ocup.sum(), len(df),
+       "Se deja NA (0.3%): muy pocos casos; se excluyen solo de los análisis de ocupación")
+falta_padres = df["educ_padres"].isna()
+df["educ_padres"] = df["educ_padres"].fillna("No sabe")
+anotar("4. Nulos", "No sabe la educación de ninguno de sus padres", falta_padres.sum(), len(df),
+       "Categoría 'No sabe' (no se imputa: no hay información de dónde inferirla)")
 anotar("4. Nulos", "Tono de piel, sexo, edad, ingreso, escaleras y factor", 0, len(df),
        "Sin nulos")
 
@@ -302,6 +328,12 @@ nivel_mayor = df["nivel_educ_num"] > p9.map(MAX_NIVEL)
 anotar("6. Consistencias", "Nivel ESRU mayor que el nivel declarado en p9", nivel_mayor.sum(), len(df),
        "Ninguno")
 
+# Quien dice que no trabajó no debe tener clase ocupacional
+no_trab = raw.loc[df.index, "p59"] == 6
+incons_trab = (no_trab & raw.loc[df.index, "clase"].notna()).sum()
+anotar("6. Consistencias", "No trabajó (p59 = 6) pero tiene clase ocupacional", incons_trab, len(df),
+       "Ninguno")
+
 # Paleta (lo que ve el encuestador) vs colorímetro (aparato): deben ir juntos
 letra_num = df["tono_piel_letra"].map(dict(zip("ABCDEFGHIJK", range(1, 12))))
 r = df[["luminosidad_piel"]].assign(t=letra_num).corr().iloc[0, 1]
@@ -340,12 +372,14 @@ anotar("7. Encoding", "Tono ordinal (1-11) y en 3 grupos; binarias mujer/univers
 # Base final: solo las variables que usa el análisis
 # ===========================================================================
 VARIABLES_FINALES = [
-    "id", "factor",                                                    # identificación y peso
+    "id", "factor", "estrato", "upm",                                  # identificación y diseño muestral
     "tono_piel_letra", "tono_piel", "tono_piel_grupo", "luminosidad_piel",   # tono de piel
     "anios_esc", "nivel_educ", "universidad", "esc_imputada",          # escolaridad
-    "ingreso_pc", "log_ingreso_pc", "quintil_ingreso", "indice_riqueza", "escalera_actual",
+    "ingreso_pc", "log_ingreso_pc", "quintil_ingreso", "indice_riqueza",  # nivel socioeconómico
+    "escalera_actual", "clase_ocup",
     "sexo", "mujer",                                                   # sexo
-    "edad", "cohorte", "region", "urbano", "autoadscripcion", "lengua_indigena", "escalera_14",
+    "edad", "region", "urbano", "autoadscripcion", "lengua_indigena",  # controles
+    "educ_padres", "escalera_14",                                      # origen familiar
 ]
 final = df[VARIABLES_FINALES]
 assert final["id"].is_unique and final["tono_piel"].between(1, 11).all()

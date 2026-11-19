@@ -2,20 +2,22 @@
 
 **Pregunta 19.** ¿Existe una asociación entre el tono de piel (medido con la escala/paleta de color) y el nivel socioeconómico actual o la escolaridad alcanzada de los entrevistados, y difiere esta relación entre hombres y mujeres?
 
-Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Espinosa Yglesias). Personas de 25 a 64 años.
+Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Espinosa Yglesias). Personas de 25 a 64 años, representativa a nivel nacional.
 
 ## Estructura
 
 ```
-├── limpieza_emovi2023.py          # script de limpieza
-├── graficas_pregunta19.py         # gráficas principales
+├── limpieza_emovi2023.py            # limpieza en los 7 pasos de la guía del curso
 ├── data/
 │   ├── raw/BASES_DE_DATOS_EMOVI2023.zip   # bases originales (sin modificar)
 │   └── clean/
-│       ├── emovi2023_final.csv     # BASE FINAL: 17,349 personas x 23 variables usadas
-│       ├── diccionario_final.csv   # qué significa cada columna
-│       └── outliers_eliminados.csv # filas quitadas por ser atípicas
-├── graficas/                      # imágenes de las gráficas
+│       ├── emovi2023_final.csv      # BASE FINAL: 17,427 personas x 24 variables
+│       ├── diccionario_final.csv    # qué significa cada columna
+│       └── outliers_eliminados.csv  # las 416 personas quitadas por ser atípicas
+├── resultados/
+│   ├── 0_perfilado_variables.csv    # paso 1: tipo, rango y % de nulos de cada variable
+│   └── bitacora_limpieza.csv        # qué se hizo en cada paso y a cuántas observaciones afectó
+├── graficas/eda/                    # histogramas y boxplots del análisis exploratorio
 └── docs/
     ├── Diccionario_ESRU_EMOVI_2023.xlsx   # diccionario oficial
     └── pregunta_19.png
@@ -24,26 +26,30 @@ Fuente: Encuesta ESRU de Movilidad Social en México 2023 (Centro de Estudios Es
 ## Cómo reproducir
 
 ```bash
-pip install pandas numpy pyreadstat
+pip install pandas numpy pyreadstat matplotlib
 python limpieza_emovi2023.py
 ```
 
-El script descomprime `entrevistado_2023.dta` del zip (pesa 41 MB, demasiado para subirlo directo) y genera `data/clean/emovi2023_final.csv`.
+El script descomprime `entrevistado_2023.dta` del zip (pesa 41 MB, demasiado para subirlo directo a GitHub) y genera la base final, el perfilado y la bitácora.
 
-## Decisiones de limpieza
+## Limpieza: los 7 pasos de la guía
 
-| Tema | Decisión |
-|---|---|
-| Base usada | Solo `entrevistado_2023.dta`. `hogar_2023` (integrantes del hogar) no se necesita, e `ingreso_2017` es de otra ola de la encuesta. |
-| Tono de piel | p112 (letras A–K) → `tono_piel` 1–11. Se verificó con el colorímetro que **A es el más oscuro y K el más claro**. Grupos: Oscuro A–E, Medio F–G, Claro H–K (A–D tienen muy pocas personas). |
-| Escolaridad | `nivel_educ` = variable oficial de ESRU (4 niveles). `anios_esc` = años de escuela construidos con p9 + p10. Si el grado es "No sabe" queda vacío (292–314 casos). |
-| Nivel socioeconómico | Tres medidas: (1) ingreso per cápita imputado por ESRU y sus quintiles; (2) escalera subjetiva 1–10; (3) índice de riqueza con componentes principales de 48 bienes y servicios de la vivienda. |
-| Quintiles | Calculados con el factor de expansión, para que cada quintil sea 20% de la población. |
-| Outliers | Regla del rango intercuartil (IQR × 1.5) en `log_ingreso_pc`, `indice_riqueza` y `luminosidad_piel`. Se eliminan **494 personas (2.8%)**; quedan 17,349. Las filas eliminadas se guardan en `data/clean/outliers_eliminados.csv`. No se buscan en edad (ya acotada 25–64), escaleras (1–10), años de escuela (los extremos son casos reales) ni en el factor de expansión. |
-| Base final | Solo las 23 variables que se usan en el análisis: identificación y ponderador, tono de piel, escolaridad, nivel socioeconómico, sexo, y variables para patrones adicionales (edad, cohorte, región, urbano/rural, autoadscripción, lengua indígena, escalera a los 14 años). |
-| Ponderador | Usar `factor` en promedios y porcentajes; `estrato` y `upm` si se calculan errores estándar con diseño muestral. |
+Se usa solo `entrevistado_2023.dta` (una fila = una persona). `hogar_2023` es la lista de integrantes del hogar y no hace falta; `ingreso_2017` es de otra ola de la encuesta.
 
-## Faltantes relevantes
+| Paso | Qué se encontró | Decisión | Obs. afectadas |
+|---|---|---|---|
+| **1. EDA** | 17,843 personas × 296 variables; ingreso muy sesgado (en logaritmo es casi simétrico); nulos en grado escolar y colorímetro | Perfilado de las 22 variables usadas y gráficas exploratorias | — |
+| **2. Errores** | `p10 = 9` = "No sabe" (código del diccionario); `p9 = 97` = "Ninguno" | El 9 pasa a NA; el 97 se conserva como 0 años. 7 reglas de rango (edad 25–64, tono A–K, escaleras 1–10, ingreso > 0…) se cumplen | 314 / 344 |
+| **3. Duplicados** | Sin filas idénticas ni folios repetidos | Nada que eliminar | 0 |
+| **4. Nulos** | Quienes no saben su grado **no son aleatorios**: más jóvenes (37 vs 42 años) y con más ingreso | Imputación simple con la mediana (años) y moda (nivel) de su mismo nivel declarado; marcados en `esc_imputada`. Colorímetro (2.6%) se deja NA: es variable secundaria | 315 / 468 |
+| **5. Outliers** | Regla IQR × 1.5. En pesos marcaría 1,336 personas solo por ganar bien, por eso se aplica al **logaritmo** del ingreso | Se eliminan extremos de ingreso (imputado por ESRU, fuera de $774–$41,208) e índice de riqueza. Extremos del colorímetro: solo la medición pasa a NA (error del aparato) | 416 eliminadas (2.3%) |
+| **6. Consistencias** | Años de escuela ≤ edad − 5 ✔; nivel ESRU ≤ nivel declarado ✔; paleta vs colorímetro r = 0.33 | 16 mediciones del colorímetro a > 3 desv. est. de su letra pasan a NA | 16 |
+| **7. Encoding** | — | Tono ordinal 1–11 y en 3 grupos; binarias (mujer, universidad, urbano, lengua indígena); log del ingreso; quintiles ponderados; índice de riqueza por componentes principales | — |
 
-- Colorímetro: ~750 casos sin medición (la paleta `tono_piel` no tiene faltantes).
-- Escolaridad: 292 casos (grado no sabe).
+## Limitaciones de calidad de los datos
+
+- **Tono de piel:** la paleta la asigna el encuestador. Su correlación con el colorímetro es moderada (r = 0.33): la luminosidad sube claramente de F a I, pero entre A y E casi no cambia. La paleta mide cómo se percibe el tono, no solo el color físico.
+- **Ingreso:** es ingreso per cápita del hogar **imputado por ESRU**, no el ingreso individual de la persona.
+- **Escolaridad imputada:** 310 personas de la base final (1.8%) tienen años de escuela imputados (`esc_imputada = 1`).
+- **Grupos extremos pequeños:** pocas personas en los tonos A–C e I–K.
+- **Ponderador:** todos los promedios y porcentajes deben usar `factor` para representar a la población.
